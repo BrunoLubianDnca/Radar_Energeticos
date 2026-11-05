@@ -193,14 +193,24 @@ def mail(offers, checked_at, preview=False):
     host = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
     port = int(os.environ.get('SMTP_PORT', '465'))
     msg = EmailMessage()
-    msg['From'] = username
+    msg['From'] = os.environ.get('EMAIL_FROM') or username
     msg['To'] = email
     msg['Subject'] = f'Monster Radar | {len(offers)} oferta(s) abaixo de R$ 8'
     msg.set_content('\n'.join(f'{x["name"]} | {brl(x["unit_price"])}/lata | {x["url"]}' for x in offers))
     msg.add_alternative(content, subtype='html')
-    with smtplib.SMTP_SSL(host, port, context=ssl.create_default_context(), timeout=25) as smtp:
-        smtp.login(username, password)
-        smtp.send_message(msg)
+    if port == 465:
+        with smtplib.SMTP_SSL(host, port, context=ssl.create_default_context(), timeout=25) as smtp:
+            smtp.login(username, password)
+            smtp.send_message(msg)
+    elif port == 587:
+        with smtplib.SMTP(host, port, timeout=25) as smtp:
+            smtp.ehlo()
+            smtp.starttls(context=ssl.create_default_context())
+            smtp.ehlo()
+            smtp.login(username, password)
+            smtp.send_message(msg)
+    else:
+        raise ValueError('SMTP_PORT deve ser 465 (SSL) ou 587 (STARTTLS)')
 
 
 def run(args):
