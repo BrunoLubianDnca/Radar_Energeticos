@@ -1,0 +1,20 @@
+[
+  {
+    "store": "Supermercado Super Opção",
+    "url": "https://www.superopcaoredefort.com.br/loja-01/produto/m/energetico-monster-473ml-energy-1645",
+    "region": "BR",
+    "shipping_sc": "não verificado"
+  },
+  {
+    "store": "Qualfarma",
+    "url": "https://www.qualfarma.com.br/bebida-energetico-monster-energy-lata-473ml-monster-energy/p",
+    "region": "BR",
+    "shipping_sc": "depende do CEP"
+  },
+  {
+    "store": "Bula - comparador",
+    "url": "https://bula.com.br/preco/energetico-monster-energy-lata-473ml-0070847022015",
+    "region": "BR",
+    "shipping_sc": "depende da loja"
+  }
+]

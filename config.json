@@ -1,0 +1,10 @@
+{
+  "price_alert_brl": 8.0,
+  "super_offer_brl": 6.5,
+  "max_per_email": 15,
+  "timeout_seconds": 18,
+  "min_sources_succeeded": 1,
+  "alert_on_first_seen": true,
+  "state_file": "data/prices.json",
+  "report_file": "data/last-report.json"
+}

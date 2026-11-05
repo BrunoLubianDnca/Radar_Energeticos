@@ -1,0 +1,82 @@
+name: Monster Radar - ofertas diarias
+on:
+  schedule:
+    - cron: '20 12 * * *' # 09:20 BRT (UTC-3); GitHub pode atrasar
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Somente testar a coleta (sem enviar e-mail ou salvar estado)'
+        type: boolean
+        default: true
+      send_test_email:
+        description: 'Enviar e-mail de teste com oferta ficticia (independente da coleta)'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: monster-radar
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
+      - run: python -m unittest discover -s tests -v
+      - name: Enviar e-mail demonstrativo (opcional)
+        if: github.event_name == 'workflow_dispatch' && inputs.send_test_email == true
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          SMTP_HOST: ${{ vars.SMTP_HOST }}
+          SMTP_PORT: ${{ vars.SMTP_PORT }}
+        run: |
+          python - <<'PY'
+          import datetime
+          from monitor import mail
+          demo = [{"name": "Monster Energy 473 ml — EXEMPLO FICTÍCIO", "store": "LOJA FICTÍCIA", "pack": 1, "price": 5.99, "unit_price": 5.99, "url": "https://example.com", "image": "", "shipping_sc": "não verificado"}]
+          mail(demo, datetime.datetime.now().isoformat(timespec='minutes'))
+          print('E-mail demonstrativo enviado')
+          PY
+      - name: Consultar ofertas
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            python monitor.py --dry-run --preview
+          else
+            python monitor.py
+          fi
+      - name: Salvar histórico no repositorio
+        if: success() && (github.event_name == 'schedule' || inputs.dry_run == false)
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/prices.json data/last-report.json
+          if git diff --cached --quiet; then
+            echo 'Sem alteracoes no historico'
+          else
+            git commit -m 'chore: atualiza historico Monster'
+            git push
+          fi
+      - name: Guardar relatorio e preview para diagnostico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monster-radar-diagnostico
+          path: |
+            data/last-report.json
+            preview.html
+          if-no-files-found: ignore
+          retention-days: 7
