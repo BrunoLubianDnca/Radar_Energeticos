@@ -1,0 +1,29 @@
+{
+  "checked_at": "2026-11-06T16:32:02-03:00",
+  "success": 1,
+  "failed": 2,
+  "errors": [
+    {
+      "store": "Supermercado Super Opção",
+      "error": "Oferta inequívoca não encontrada (produtos com preço: 0)"
+    },
+    {
+      "store": "Bula - comparador",
+      "error": "Oferta inequívoca não encontrada (produtos com preço: 0)"
+    }
+  ],
+  "offers": [
+    {
+      "id": "Qualfarma|https://www.qualfarma.com.br/bebida-energetico-monster-energy-lata-473ml-monster-energy/p",
+      "store": "Qualfarma",
+      "name": "Bebida Energético Monster Energy Lata 473Ml - Monster Energy",
+      "url": "https://www.qualfarma.com.br/bebida-energetico-monster-energy-lata-473ml-monster-energy/p",
+      "image": "https://www.qualfarma.com.br/cdn-cgi/imagedelivery/YkMPToGQ9rsd5EY3QoxN2w/a5ecb343-4f75-4276-d2fe-5ca308c11500/public",
+      "pack": 1,
+      "price": 10.99,
+      "unit_price": 10.99,
+      "shipping_sc": "depende do CEP",
+      "region": "BR"
+    }
+  ]
+}
